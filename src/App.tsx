@@ -1,26 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import axios from "axios";
+import WordDetails from "./components/WordDetails";
+import "./App.css";
+import { Word } from "./components/Types/types";
 
-function App() {
+const App: React.FC = () => {
+  const [keyword, setKeyword] = useState<string>("");
+  const [result, setResult] = useState<null | Word>(null);
+  const api: string = "https://api.dictionaryapi.dev/api/v2/entries/en";
+  const handleSearch = async () => {
+    try {
+      const res = await axios.get(`${api}/${keyword}`);
+
+      setResult(res.data[0]);
+    } catch (e) {
+      console.log({ e });
+    }
+  };
+  const handleClear = () => {
+    setKeyword("");
+    setResult(null);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <input value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+      <button className="button" type="submit" onClick={handleSearch}>
+        Search
+      </button>
+      <button
+        disabled={!result}
+        className="button"
+        type="submit"
+        onClick={handleClear}
+      >
+        Clear
+      </button>
+      {result && <WordDetails {...{ result }} />}
     </div>
   );
-}
+};
 
 export default App;
